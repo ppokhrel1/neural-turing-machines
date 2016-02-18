@@ -9,7 +9,10 @@ import controller
 import model
 import tasks
 import sys
+
 np.random.seed(1234)
+
+from utils.gen_coords import read_pdb
 
 #read the residue sequence and structure from file
 #get residue sequence( 7-9 length ) and the predicted structure
@@ -136,22 +139,24 @@ if __name__ == "__main__":
         #print str(length)
         #i, o = tasks.copy(8, length)
     inputs = read_sentence_n_gen_lists()
+    import os
         #print inputs
-    for m in inputs:
-        for counter in xrange(max_sequences): # this is for fun, we will delete it as soon as we have enough data
-            (x,y) = m
-            i,o = x, y
-            if score == None:
-                score = train(i, o)
-            else:
-                score = alpha * score + (1 - alpha) * train(i, o)
-                print "round:", counter, "score:", score
-                if score < best_score:
-                    # improve patience if loss improvement is good enough
-                    if score < best_score * improvement_threshold:
-                        patience = max(patience, counter * patience_increase)
-                P.save(model_out)
-                best_score = score
+    for counter in xrange(max_sequences):
+        for file in os.listdir("training"):
+            if file.endswith(".pdb"):
 
-            if patience <= counter:
-                break
+         # this is for fun, we will delete it as soon as we have enough data
+                i,o = read_pdb("training/" + file)
+                if score == None:
+                    score = train(i, o)
+                else:
+                    score = alpha * score + (1 - alpha) * train(i, o)
+                    print "round:", counter, "score:", score
+                    if score < best_score:
+                        # improve patience if loss improvement is good enough
+                        if score < best_score * improvement_threshold:
+                            patience = max(patience, counter * patience_increase)
+                if patience <= counter:
+                    break
+        P.save(model_out)
+        best_score = score
