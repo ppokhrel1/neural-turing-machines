@@ -29,12 +29,15 @@ SOURCE  12 ORGANISM_TAXID: 10377
 KEYWDS    BS69, EBNA2, MYND, ZMYND11, COILED-COIL, IMMUNE SYSTEM                
 EXPDTA    X-RAY DIFFRACTION                                                     
 AUTHOR    J.SONG,M.HARTER                                                       
+REVDAT   2   17-FEB-16 5HDA    1       JRNL                                     
 REVDAT   1   20-JAN-16 5HDA    0                                                
-JRNL        AUTH   M.R.HARTER,C.-D.LIU,C.-L.SHEN,E.GONZALEZ-HURTADO,Z.-M.ZHANG, 
-JRNL        AUTH 2 M.XU,E.MARTINEZ,C.-W.PENG,J.SONG                             
-JRNL        TITL   BS69/ZMYND11 C-TERMINAL DOMAINS BIND AND INHIBIT EBNA2       
-JRNL        REF    PLOS PATHOG.                               2016              
+JRNL        AUTH   M.R.HARTER,C.D.LIU,C.L.SHEN,E.GONZALEZ-HURTADO,Z.M.ZHANG,    
+JRNL        AUTH 2 M.XU,E.MARTINEZ,C.W.PENG,J.SONG                              
+JRNL        TITL   BS69/ZMYND11 C-TERMINAL DOMAINS BIND AND INHIBIT EBNA2.      
+JRNL        REF    PLOS PATHOG.                  V.  12 05414 2016              
 JRNL        REFN                   ESSN 1553-7374                               
+JRNL        PMID   26845565                                                     
+JRNL        DOI    10.1371/JOURNAL.PPAT.1005414                                 
 REMARK   2                                                                      
 REMARK   2 RESOLUTION.    2.39 ANGSTROMS.                                       
 REMARK   3                                                                      

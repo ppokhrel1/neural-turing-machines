@@ -122,10 +122,11 @@ if __name__ == "__main__":
         input_size=9,
         mem_size=128,
         mem_width=20,
-        output_size=9
+        output_size=27,
+        hidden_sizes=[100, 100]
     )
     #print "xxx"
-    max_sequences = 100000
+    max_sequences = 1000
     patience = 20000
     patience_increase = 3
     improvement_threshold = 0.995
@@ -138,17 +139,17 @@ if __name__ == "__main__":
         #    int(20 * (min(counter, 50000) / float(50000))**2) + 1) + 1
         #print str(length)
         #i, o = tasks.copy(8, length)
-    inputs = read_sentence_n_gen_lists()
+    #inputs = read_sentence_n_gen_lists()
     import os
         #print inputs
     for counter in xrange(max_sequences):
         for file in os.listdir("training"):
             if file.endswith(".pdb"):
-
-         # this is for fun, we will delete it as soon as we have enough data
+                print file
                 i,o = read_pdb("training/" + file)
                 if score == None:
                     score = train(i, o)
+                    print score
                 else:
                     score = alpha * score + (1 - alpha) * train(i, o)
                     print "round:", counter, "score:", score
