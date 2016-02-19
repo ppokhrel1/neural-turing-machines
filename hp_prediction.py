@@ -123,7 +123,7 @@ if __name__ == "__main__":
         mem_size=128,
         mem_width=20,
         output_size=27,
-        hidden_sizes=[100, 100]
+        hidden_sizes=[100, 100] # two hidden layers with 100 neurons each
     )
     #print "xxx"
     max_sequences = 1000
