@@ -35,8 +35,8 @@ def read_pdb(fileName):
                     #residues.pop()
                     #coords.pop()
                     #print len(coords)
-    myres = residues[: (len(residues)- len(residues) % 9)]
-    mycoords = coords[: (len(coords) - len(coords) % 27)]
+    myresidues = residues[: (len(residues)- len(residues) % 9)]
+    mycoordinates = coords[: (len(coords) - len(coords) % 27)]
 
     #print len(myres)%9
     #print len(mycoords)%27
@@ -45,18 +45,28 @@ def read_pdb(fileName):
     #mycoords = reduce(operator.add, mycoords)
 
     # create numpy arrays from the lists
-    myres = array(myres, dtype='float32')
-    mycoords = array(mycoords, dtype='float32')
+    for i in xrange(len(myresidues) / 9):
+        #print i
+        myres = array(myresidues[i*9 : (i+1) * 9], dtype='float32')
+        mycoords = array(mycoordinates[i*27 : (i+1) * 27], dtype='float32')
 
-    myres = myres.reshape(len(myres)/9, 9)
-    #print myres
-    #print myres.shape
+        #print len(mycoords)
+        #print len(myres)
+        myres = myres.reshape(len(myres)/9, 9)
+        #print myresidues[i*9 : (i+1) * 9]
+        #print myres.shape
 
-    mycoords = mycoords.reshape(len(mycoords)/27, 27)
-    #print mycoords
-    #print mycoords.shape
-    #print mycoords
-    return myres, mycoords
+        mycoords = mycoords.reshape(len(mycoords)/27, 27)
+        #print mycoords
+        #print mycoords.shape
+        #print mycoords
+        #print myres
+        #print mycoords
+        #myresval.append(myres)
+        #mycoordsval.append(mycoords)
+
+        yield myres, mycoords
+    #return myresval, mycoordsval
 
 if __name__ == "__main__":
     import sys

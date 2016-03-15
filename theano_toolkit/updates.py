@@ -104,7 +104,7 @@ def momentum(parameters, gradients, mu=0.9, learning_rate=1e-3, P=None):
 
 
 @track_parameters
-def rmsprop(parameters, gradients, discount=0.95, momentum=0.9, learning_rate=1e-4, epsilon=1e-4, P=None):
+def rmsprop(parameters, gradients, discount=0.95, momentum=0.9, learning_rate=1e-4, epsilon=1e-3, P=None):
     shapes = get_shapes(parameters)
     sq_acc = [create_param(P, "sq_acc_" + p.name, np.zeros(s))
               for p, s in izip(parameters, shapes)]
@@ -127,6 +127,7 @@ def rmsprop(parameters, gradients, discount=0.95, momentum=0.9, learning_rate=1e
     delta_updates = [(d_a, d) for d_a, d in izip(delta_acc, deltas)]
     parameters_updates = [(p, p - d) for p, d in izip(parameters, deltas)]
 
+    #parameters_updates = [(T.maximum(p, 0), T.maximum(a, 0)) for (p ,a) in parameters_updates]
     return deltas, acc_updates + sq_acc_updates + delta_updates
 
 

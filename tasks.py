@@ -17,6 +17,7 @@ def copy(input_size, max_size):
     input_sequence[:sequence_length, :-1] = sequence
     input_sequence[sequence_length, -1] = 1
     output_sequence[sequence_length + 1:, :-1] = sequence
+    #print input_sequence
     return input_sequence, output_sequence
 
 
@@ -34,8 +35,8 @@ def repeat_copy(input_size, max_size, num_repeats):
     output_sequence[sequence_length + 1:-1, :-
                     1] = np.tile(sequence, (num_repeats, 1))
     output_sequence[-1, -1] = 1
+    #print input_sequence
     return input_sequence, output_sequence
 
 
 #now, for the protein sequence prediction part
-

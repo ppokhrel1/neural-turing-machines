@@ -40,7 +40,7 @@ class Parameters():
 
     def __getattr__(self, name):
         params = self.__dict__['params']
-        return self.params[name]
+        return params[name]
 
     def remove(self, name):
         del self.__dict__['params'][name]

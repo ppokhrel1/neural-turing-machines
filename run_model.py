@@ -11,7 +11,6 @@ import tasks
 import random
 import math
 
-
 def make_model(
         input_size=8,
         output_size=8,

@@ -34,6 +34,7 @@ def create_shared(array, dtype=theano.config.floatX, name=None):
         name=name,
     )
 
+#write your own softmax instead of using Theano's
 
 def vector_softmax(vec):
     return T.nnet.softmax(vec.reshape((1, vec.shape[0])))[0]

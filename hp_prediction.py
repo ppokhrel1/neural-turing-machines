@@ -10,6 +10,7 @@ import model
 import tasks
 import sys
 
+from train_copy import detect_nan
 np.random.seed(1234)
 
 from utils.gen_coords import read_pdb
@@ -76,11 +77,20 @@ def read_sentence_n_gen_lists():
         sentence = file.readline()
 
     file.close()
-    #add padding alter on
+    #add padding later on
     return inputs
 
+def test_possible(seq, directions):
 
+    return 0
+#all possible residues
+def gen_possible(sequence):
+    return ()
 
+def gen_lowest(data):
+    yield 0
+
+#make the training model
 def make_train(input_size, output_size, mem_size, mem_width, hidden_sizes=[100]):
     P = Parameters()
     ctrl = controller.build(P, input_size, output_size,
@@ -106,7 +116,9 @@ def make_train(input_size, output_size, mem_size, mem_width, hidden_sizes=[100])
     train = theano.function(
         inputs=[input_seq, output_seq],
         outputs=cost,
-        updates=updates.adadelta(params, grads)
+        mode=theano.compile.MonitorMode(
+                        post_func=detect_nan),
+        updates=updates.rmsprop(params, grads)
     )
 
     #print str(train)
@@ -123,11 +135,11 @@ if __name__ == "__main__":
         mem_size=128,
         mem_width=20,
         output_size=27,
-        hidden_sizes=[100, 100] # two hidden layers with 100 neurons each
+        hidden_sizes=[500, 500] # hidden layers size, no of neurons in each layer separated by a comma
     )
     #print "xxx"
-    max_sequences = 1000
-    patience = 20000
+    max_sequences = 100
+    patience = 20
     patience_increase = 3
     improvement_threshold = 0.995
     best_score = np.inf
@@ -141,23 +153,42 @@ if __name__ == "__main__":
         #i, o = tasks.copy(8, length)
     #inputs = read_sentence_n_gen_lists()
     import os
-        #print inputs
+    training_data = []
+
+    print "Preparing input data ........\n"
+
+    for file in os.listdir("training"):
+        if file.endswith(".pdb"):
+            print file
+            #i,o = read_pdb("training/" + file)
+            #training_data.append((i, o))
+            #print(read_pdb("training/" + file))
+            for i,o in read_pdb("training/" + file):
+                '''for x in len(i):
+                    training_data.append((i.get(x), o.get(x)))
+                '''
+                if (len(i) != 0 and len(o) != 0):
+                    training_data.append((i, o))
+            #yield (i,o)
+    def generate_input():
+        for x in training_data:
+            yield x
+    print "Done... \n"
+
+    print "Starting training.....\n"
     for counter in xrange(max_sequences):
-        for file in os.listdir("training"):
-            if file.endswith(".pdb"):
-                print file
-                i,o = read_pdb("training/" + file)
-                if score == None:
-                    score = train(i, o)
-                    print score
-                else:
-                    score = alpha * score + (1 - alpha) * train(i, o)
-                    print "round:", counter, "score:", score
-                    if score < best_score:
-                        # improve patience if loss improvement is good enough
-                        if score < best_score * improvement_threshold:
-                            patience = max(patience, counter * patience_increase)
-                if patience <= counter:
-                    break
-        P.save(model_out)
-        best_score = score
+        for i, o in generate_input():
+            if score == None:
+                score = train(i, o)
+                print score
+            else:
+                score = alpha * score + (1 - alpha) * train(i, o)
+                print "round:", counter, "score:", score
+                if score < best_score:
+                    # improve patience if loss improvement is good enough
+                    if score < best_score * improvement_threshold:
+                        patience = max(patience, counter * patience_increase)
+            if patience <= counter:
+                break
+    P.save(model_out)
+    best_score = score
