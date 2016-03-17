@@ -135,7 +135,7 @@ if __name__ == "__main__":
         mem_size=128,
         mem_width=20,
         output_size=27,
-        hidden_sizes=[500, 500] # hidden layers size, no of neurons in each layer separated by a comma
+        hidden_sizes=[1024, 1024] # hidden layers size, no of neurons in each layer separated by a comma
     )
     #print "xxx"
     max_sequences = 100
