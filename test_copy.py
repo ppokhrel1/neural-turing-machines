@@ -13,7 +13,7 @@ p, do_task = run_model.make_model(input_size=8,
     hidden_sizes=[100]
     )
 with p:
-    s = p.load('copy')
+    s = p.load('cpy')
 print p.values()
 i = np.array([[0, 1, 1, 1, 0, 0, 0, 0]], dtype='float32')
 weights, output = do_task(i)

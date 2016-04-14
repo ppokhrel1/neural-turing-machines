@@ -26,12 +26,12 @@ def plot_weights(seq_length):
     i, o = tasks.copy(8, seq_length)
     weights, outputs = do_task(i)
     plt.figure(1, figsize=(20, 20))
-    plt.imshow(weights.T[00:123], interpolation='nearest', cmap=cm.gray)
+    plt.imshow(weights.T[00:153], interpolation='nearest', cmap=cm.gray)
     plt.show()
 
 if __name__ == "__main__":
     P, do_task = run_model.make_model()
     #P.load('l2_low_learning_rate.mdl')
-    P.load('ss')
-    plot(20)
-    plot_weights(20)
+    P.load('cpy')
+    plot(40)
+    plot_weights(40)

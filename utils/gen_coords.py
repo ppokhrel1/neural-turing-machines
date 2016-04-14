@@ -1,9 +1,36 @@
 
 from numpy import array, reshape
 
-chart = {'ALA': 1, 'IIE' : 2, 'LEU':3, 'VAL':4, "PHE":5, "TRP":6, "TYR":7, "ASN":8, "CYS":9,"GLU":10, "MET":11,"SER":12,"THR":13, "ASP":14, "GLU":15, "ARG":18, "HIS":20, "LYS":20}
+#chart = {'ALA': '00001', 'IIE' : '00010', 'LEU':'00011', 'VAL':'00100', "PHE":'00101', "TRP": '00110', "TYR": '00111', "ASN": '01000', "CYS": '01001',"GLU": '01010', "MET": '01011',"SER": '01100',"THR": '01101', "ASP": '01110', "GLU": '01111', "ARG":'10000', "HIS":'10001', "LYS":'10010', 'UNK' : '10011'}
 
-chart = {'ALA' : 1, 'GLN':2, "LEU":3, "SER":4, "ARG":5,"GLU":6, "LYS":7, "THR":8,'ASN':9,"GLY":10, 'MET':11, "TRP":12, "ASP":13, "HIS":14, "PHE":15, "TYR":16, "CYS":17, "ILE":18, "PRO":19, "VAL":20, "UNK":21}
+input_length = 9*20
+
+from itertools import izip
+def gen_training_data(fileName): #pdb filename from which we check both dssp and pdb files
+    input_data = [0.0] * input_length
+    for x, y in izip(read_pdb(fileName), read_dssp(fileName[:-4] + '.dssp')):
+        for i in xrange(20):
+            input_data.pop(i)
+        for a in x:
+            for num in a:
+                input_data.append(float(num))
+        #output_data = y
+        print x
+        output_data = []
+        #print input_data
+        for b in y:
+            for mynum in b:
+                output_data.append(float(mynum))
+        #print output_data
+        print len(input_data)
+        #print len(output_data)
+        #later on, we add features for storing the structure predicted to make it easier for later predictions
+        yield array(input_data, dtype='float32').reshape(1, input_length), array(output_data, dtype='float32').reshape(1, 3)
+
+
+
+
+chart = {'ALA' : '0'*19 + '1', 'GLN': '0'*18 + '1' + '0', "LEU": '0'*17 + '1' + '0'*2, "SER": '0'*16 + '1' + '0'*3, "ARG": '0'*15 + '1' + '0'*4,"GLU": '0'*14 + '1' + '0'*5, "LYS": '0'*13 + '1' + '0'*6, "THR": '0'*12 + '1' + '0'*7,'ASN': '0'*11 + '1' + '0'*8,"GLY": '0'*10 + '1' + '0'*9, 'MET': '0'*9 + '1' + '0'*10, "TRP": '0'*8 + '1' + '0'*11, "ASP":'0'*7 + '1' + '0'*12, "HIS": '0'*6 + '1' + '0'*13, "PHE": '0'*5 + '1' + '0'*14, "TYR":'0'*4 + '1' + '0'*15, "CYS": '0'*3 + '1' + '0'*16, "ILE": '0'*2 + '1' + '0'*17, "PRO": '0' + '1' + '0'*18, "VAL": '1' + '0'*19, "UNK": '0'*20}
 def read_pdb(fileName):
     residues = []
     coords = []
@@ -14,59 +41,44 @@ def read_pdb(fileName):
             if myline[0] == 'ATOM' and len(myline[3]) > 2: #check only for amino acids, not the RNA molecules
                 #print myline[3]
                 residues.append(chart[(myline[3][-3:])]) #get the last three letters. Ignore Alpha or Beta type
-                #print myline[5],
-                #print myline[6],
-                #print myline[7]
-                if (cmp(prevcoords,[]) == 0):
-                    mycoords = [0 , 0, 0]
-                else:
-                    mycoords = [round(float(prevcoords[0]) - float(myline[5])),
-                    round(float(prevcoords[1]) - float(myline[6])),
-                    round(float(prevcoords[2]) - float(myline[7]))]
-                prevcoords = [myline[5], myline[6], myline[7]]
-                coords.append(mycoords[0])
-                coords.append(mycoords[1])
-                coords.append(mycoords[2])
 
                 #for simplicity now, we will only compute till residues number equals multiple of 9
-                scale_factor = len(residues) % 9
+                #scale_factor = len(residues) % 9
                 #print scale_factor
                 #for x in range(scale_factor):
                     #residues.pop()
                     #coords.pop()
                     #print len(coords)
-    myresidues = residues[: (len(residues)- len(residues) % 9)]
-    mycoordinates = coords[: (len(coords) - len(coords) % 27)]
-
-    #print len(myres)%9
-    #print len(mycoords)%27
-    #reduce mycoords to a flat list
-    #import operator
-    #mycoords = reduce(operator.add, mycoords)
-
-    # create numpy arrays from the lists
-    for i in xrange(len(myresidues) / 9):
-        #print i
-        myres = array(myresidues[i*9 : (i+1) * 9], dtype='float32')
-        mycoords = array(mycoordinates[i*27 : (i+1) * 27], dtype='float32')
-
-        #print len(mycoords)
-        #print len(myres)
-        myres = myres.reshape(len(myres)/9, 9)
-        #print myresidues[i*9 : (i+1) * 9]
-        #print myres.shape
-
-        mycoords = mycoords.reshape(len(mycoords)/27, 27)
-        #print mycoords
-        #print mycoords.shape
-        #print mycoords
-        #print myres
-        #print mycoords
-        #myresval.append(myres)
-        #mycoordsval.append(mycoords)
-
-        yield myres, mycoords
+    returnVal = residues
+    return returnVal
     #return myresval, mycoordsval
+
+
+CODES = {'0': '000', 'H' : '001', 'B' : '010', 'E' : '011', 'G': '100', 'I' : '101', 'T': '110', 'S': '111'}
+
+def read_dssp(fileName):
+    residues = []
+    structures = []
+    with open(fileName, "r") as f:
+        start = False
+        for line in f:
+            myline = line.split() #split the lines to a list
+            if myline[1] == 'RESIDUE' and myline[2] == 'AA':
+                start = True
+            #if the above line finds start of structures from dssp file
+            elif start == True:
+                #check if fourth index is structure
+                #structures if structre present else give '0'
+                if myline[4].isalpha() and myline[4] != 'X':
+                    structures.append(myline[4])
+                else:
+                    structures.append('0')
+    #TODO:Now,compare it with dict and give values
+    temp = []
+    for structure in structures:
+        temp.append(CODES[structure])
+    #print temp
+    return temp
 
 if __name__ == "__main__":
     import sys

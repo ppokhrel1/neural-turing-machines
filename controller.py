@@ -12,7 +12,7 @@ from collections import namedtuple
 
 def build(P, input_size, output_size, mem_size, mem_width, layer_sizes):
     """
-    Create controller function for use during scan op
+    Create a controller function for use during scan op
     """
 
     P.W_input_hidden = U.initial_weights(input_size, layer_sizes[0])

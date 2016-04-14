@@ -34,7 +34,7 @@ def make_train(input_size, output_size, mem_size, mem_width, hidden_sizes=[100])
     train = theano.function(
         inputs=[input_seq, output_seq],
         outputs=T.sum(cross_entropy),
-        updates=updates.rmsprop(params, grads)
+        updates=updates.adadelta(params, grads)
     )
 
     return P, train

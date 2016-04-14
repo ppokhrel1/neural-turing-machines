@@ -9,7 +9,7 @@ import head
 import scipy
 
 
-#TODO:Replace the softmax with your own implementaton to possibly remove NaNs
+#DONE:Replace the softmax with your own implementaton to possibly remove NaNs
 def cosine_sim(k, M):
     k_unit = k / (T.sqrt(T.sum(k**2)) + 1e-5)
     # T.patternbroadcast(k_unit.reshape((1,k_unit.shape[0])),(True,False))

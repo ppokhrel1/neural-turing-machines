@@ -32,10 +32,12 @@ def detect_nan(i, node, fn):
         if (not isinstance(output[0], np.random.RandomState) and
             np.isnan(output[0]).any()):
             print('*** NaN detected ***')
-            theano.printing.debugprint(node)
+            #theano.printing.debugprint(node)
             #np.clip(output, -10, 10, out=output)
-            print('Inputs : %s' % [input[0] for input in fn.inputs])
-            print('Outputs: %s' % [output[0] for output in fn.outputs])
+            print([T.sgn(input[0]) for input in fn.inputs])
+
+            #print('Inputs : %s' % [input[0] for input in fn.inputs])
+            #print('Outputs: %s' % [output[0] for output in fn.outputs])
             break
 
 def make_train(input_size, output_size, mem_size, mem_width, hidden_sizes=[100]):
@@ -58,8 +60,8 @@ def make_train(input_size, output_size, mem_size, mem_width, hidden_sizes=[100])
         l2 = l2 + (p ** 2).sum()
     cost = T.sum(cross_entropy) + 1e-4 * l2
     #print "cost", cost
-    grads = [T.clip(g, -10, 10) for g in T.grad(cost, wrt=params)]
-    #clip grads again
+    grads = [T.clip(g, -100, 100) for g in T.grad(cost, wrt=params)] #if 0 is in the grads, we set it to 1e-10 to avoid exploding gradients
+    #print grads
     #grads = T.clip(grads, -10, 10)
     #mode = theano.compile.MonitorMode(post_func=detect_nan).excluding(
     #'local_elemwise_fusion', 'inplace')
@@ -70,7 +72,7 @@ def make_train(input_size, output_size, mem_size, mem_width, hidden_sizes=[100])
         mode=theano.compile.MonitorMode(
                         post_func=detect_nan),
         #mode=NanGuardMode(nan_is_error=True, inf_is_error=True, big_is_error=False),
-        updates=updates.rmsprop(params, grads, learning_rate = 1e-4)
+        updates=updates.rmsprop(params, grads, learning_rate = 1e-8)
     )
 
     return P, train
@@ -95,11 +97,9 @@ if __name__ == "__main__":
     score = None
     alpha = 0.95
     for counter in xrange(max_sequences):
-        length = np.random.randint(
-           int(20 * (min(counter, 50000) / float(50000))**2) + 1) + 1
 
         #print length
-        #length = np.random.randint(1,21)
+        length = np.random.randint(1,21)
         #print str(length)
         i, o = tasks.copy(8, length)
 

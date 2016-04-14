@@ -39,7 +39,9 @@ def build(P, id, input_size, mem_width, mem_size, shift_width):
         beta_t = T.nnet.softplus(_beta_t)
         gamma_t = T.nnet.softplus(_gamma_t) + 1.
 #		beta_t  = (_beta_t  > 0)*_beta_t
-#		gamma_t = (_gamma_t > 0)*_gamma_t + 1.
+        #print beta_t
+        #gamma_t = (_gamma_t > 0)*_gamma_t + 1.
+        #print gamma_t
         #beta_t  = T.exp(_beta_t)
         #gamma_t = T.exp(_gamma_t) + 1.
 

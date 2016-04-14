@@ -13,7 +13,7 @@ import sys
 from train_copy import detect_nan
 np.random.seed(1234)
 
-from utils.gen_coords import read_pdb
+from utils.gen_coords import *
 
 #read the residue sequence and structure from file
 #get residue sequence( 7-9 length ) and the predicted structure
@@ -90,6 +90,7 @@ def gen_possible(sequence):
 def gen_lowest(data):
     yield 0
 
+from theano.compile.debugmode import DebugMode
 #make the training model
 def make_train(input_size, output_size, mem_size, mem_width, hidden_sizes=[100]):
     P = Parameters()
@@ -111,14 +112,14 @@ def make_train(input_size, output_size, mem_size, mem_width, hidden_sizes=[100])
     for p in params:
         l2 = l2 + (p ** 2).sum()
     cost = T.sum(cross_entropy) + 1e-3 * l2
-    grads = [T.clip(g, -100, 100) for g in T.grad(cost, wrt=params)]
+    grads = [T.clip(g, -100, 100) for g in T.grad(cost, wrt=params)] #if 0 is in the grads, we set it to 1e-10 to avoid exploding gradients
     #print "ads"
     train = theano.function(
         inputs=[input_seq, output_seq],
         outputs=cost,
         mode=theano.compile.MonitorMode(
                         post_func=detect_nan),
-        updates=updates.rmsprop(params, grads)
+        updates=updates.rmsprop(params, grads, learning_rate = 1e-3) #current model produced "ss" is trained using this learning rate
     )
 
     #print str(train)
@@ -126,20 +127,21 @@ def make_train(input_size, output_size, mem_size, mem_width, hidden_sizes=[100])
 
 
 
+import copy
 
 if __name__ == "__main__":
     model_out = sys.argv[1]
 
     P, train = make_train(
-        input_size=9,
+        input_size=9 * 20,
         mem_size=128,
         mem_width=20,
-        output_size=27,
-        hidden_sizes=[1024, 1024] # hidden layers size, no of neurons in each layer separated by a comma
+        output_size=3,
+        hidden_sizes=[100, 100] # hidden layers size, no of neurons in each layer separated by a comma
     )
     #print "xxx"
-    max_sequences = 100
-    patience = 20
+    max_sequences = 10
+    patience = 2
     patience_increase = 3
     improvement_threshold = 0.995
     best_score = np.inf
@@ -157,37 +159,40 @@ if __name__ == "__main__":
 
     print "Preparing input data ........\n"
 
-    for file in os.listdir("training"):
-        if file.endswith(".pdb"):
-            print file
-            #i,o = read_pdb("training/" + file)
-            #training_data.append((i, o))
-            #print(read_pdb("training/" + file))
-            for i,o in read_pdb("training/" + file):
-                '''for x in len(i):
-                    training_data.append((i.get(x), o.get(x)))
-                '''
-                if (len(i) != 0 and len(o) != 0):
-                    training_data.append((i, o))
-            #yield (i,o)
     def generate_input():
-        for x in training_data:
-            yield x
+        for file in os.listdir("training"):
+            if file.endswith(".pdb"): # or file.endswith('.dssp'):
+                print file
+                #i,o = read_pdb("training/" + file)
+                #training_data.append((i, o))
+                #print(read_pdb("training/" + file))
+                for i,o in gen_training_data("training/" + file):
+                    '''
+                        training_data.append((i.get(x), o.get(x)))
+                        '''
+                    if (len(i) != 0 and len(o) != 0):
+                        yield i, o
+
     print "Done... \n"
 
+    temp_parameters = 0
     print "Starting training.....\n"
+    runs = 0
     for counter in xrange(max_sequences):
         for i, o in generate_input():
+            runs += 1
             if score == None:
                 score = train(i, o)
                 print score
             else:
                 score = alpha * score + (1 - alpha) * train(i, o)
-                print "round:", counter, "score:", score
+                print "epoch:", counter, "round: ", runs, "score:", score
                 if score < best_score:
                     # improve patience if loss improvement is good enough
                     if score < best_score * improvement_threshold:
                         patience = max(patience, counter * patience_increase)
+
+
             if patience <= counter:
                 break
     P.save(model_out)
