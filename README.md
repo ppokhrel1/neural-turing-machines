@@ -1,8 +1,11 @@
 Neural Turing Machines
 ======================
 
-Although the controller is vaguely implemented, it still provides for the multi layer feedforward network. I have tried to implement protein structure prediction along with the few other adventures described in the paper.
-I will continue to update it.
+Although the controller is vaguely implemented, it still provides for the multi layer feedforward network.
+
+
+Doing protein structure prediction using NTM. Achieves accuracy of 69% after training for 1000 epochs.
+Benchmark dataset of 2000 proteins.
 
 The theano_toolkit was taken from somewhere in github. I forgot where it was.
 
